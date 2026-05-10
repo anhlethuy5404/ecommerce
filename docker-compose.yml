@@ -1,0 +1,187 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ecom
+      POSTGRES_PASSWORD: ecom1298
+      POSTGRES_DB: ecommerce
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  product-service:
+    image: python:3.12-slim
+    container_name: product-service
+    depends_on:
+      - db
+    volumes:
+      - ./product-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8001"
+
+  catalog-service:
+    image: python:3.12-slim
+    container_name: catalog-service
+    depends_on:
+      - db
+    volumes:
+      - ./catalog-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8002"
+
+  user-service:
+    image: python:3.12-slim
+    container_name: user-service
+    depends_on:
+      - db
+    volumes:
+      - ./user-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8003"
+
+  order-service:
+    image: python:3.12-slim
+    container_name: order-service
+    depends_on:
+      - db
+    volumes:
+      - ./order-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8004"
+
+  payment-service:
+    image: python:3.12-slim
+    container_name: payment-service
+    depends_on:
+      - db
+    volumes:
+      - ./payment-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8005:8005"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8005"
+
+  shipping-service:
+    image: python:3.12-slim
+    container_name: shipping-service
+    depends_on:
+      - db
+    volumes:
+      - ./shipping-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8006:8006"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8006"
+
+  cart-service:
+    image: python:3.12-slim
+    container_name: cart-service
+    depends_on:
+      - db
+    volumes:
+      - ./cart-service:/app
+      - ./requirements.txt:/app/requirements.txt:ro
+    working_dir: /app
+    ports:
+      - "8007:8007"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ecommerce
+      DATABASE_USER: ecom
+      DATABASE_PASSWORD: ecom1298
+    command: >
+      bash -lc "pip install --no-cache-dir -r requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8007"
+
+  frontend:
+    build: ./ecommerce-home-page
+    container_name: frontend
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./ecommerce-home-page:/app
+      - frontend_node_modules:/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run dev -- -H 0.0.0.0 -p 3000
+
+  api-gateway:
+    image: nginx:stable-alpine
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - product-service
+      - catalog-service
+      - user-service
+      - order-service
+      - payment-service
+      - shipping-service
+      - cart-service
+      - frontend
+    volumes:
+      - ./api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  postgres_data:
+  frontend_node_modules:
