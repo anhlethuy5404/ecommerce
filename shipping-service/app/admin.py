@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ShippingMethod
+
+
+@admin.register(ShippingMethod)
+class ShippingMethodAdmin(admin.ModelAdmin):
+    list_display = ("code", "name", "price", "estimated_days", "active")
+    list_filter = ("active",)
+    search_fields = ("code", "name")

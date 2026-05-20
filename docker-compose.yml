@@ -8,9 +8,10 @@ services:
     environment:
       POSTGRES_USER: ecom
       POSTGRES_PASSWORD: ecom1298
-      POSTGRES_DB: ecommerce
+      POSTGRES_DB: ecommerce_product
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init/init-dbs.sql:/docker-entrypoint-initdb.d/init-dbs.sql:ro
 
   product-service:
     image: python:3.12-slim
@@ -26,7 +27,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_product
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
@@ -46,7 +47,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_catalog
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
@@ -66,7 +67,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_user
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
@@ -86,7 +87,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_order
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
@@ -106,7 +107,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_payment
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
@@ -126,7 +127,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_shipping
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
@@ -146,7 +147,7 @@ services:
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: ecommerce
+      DATABASE_NAME: ecommerce_cart
       DATABASE_USER: ecom
       DATABASE_PASSWORD: ecom1298
     command: >
